@@ -182,7 +182,7 @@ void buscarGenero(Libro catalogo[], int total){
 
     }
 }
-void buscarGenero(Libro catalogo[], int total){
+void buscarAnio(Libro catalogo[], int total){
     char years[MAX_STR];
     printf("Ingrese el anio a buscar: ");
     getchar();
