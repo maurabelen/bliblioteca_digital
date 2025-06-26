@@ -1,6 +1,9 @@
+#include "tdas/list.h"
+#include "tdas/map.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #define MAX_STR 100
 #define MAX_LIBROS 1000
 #define MAX_USUARIOS 100
@@ -11,17 +14,18 @@ typedef struct {
     char titulo[MAX_STR];
     char autor[MAX_STR];
     char genero[MAX_STR];
-    int years;
+    int anio;
+    bool bookState = true;
 } Libro;
 
 // Estructura para el un usuario
 typedef struct {
-    int idUsuario;                 // Identificador único
-    NodoLibro *prestamosActuales; // Lista enlazada de libros actualmente prestados
-    NodoLibro *historial;         // Lista enlazada de todos los libros que ha tomado
+    int idUsuario;              // Identificador único
+    List *prestamosActuales = list_create(); // Lista enlazada de libros actualmente prestados
+    List *historial = list_create();         // Lista enlazada de todos los libros que ha tomado
 } Usuario;
 
-int cargarCatalogo(const char *nombreArchivo, Libro catalogo[], int maxLibros) {
+int cargarCatalogo(Map*mapaAño , Map*mapaAño , Map*mapaAño , Map*mapaAño ,Map*mapaAño ) {
     FILE *archivo = fopen(nombreArchivo, "r");
     if (archivo == NULL) {
         printf("Error al abrir el archivo %s\n", nombreArchivo);
@@ -54,7 +58,7 @@ int cargarCatalogo(const char *nombreArchivo, Libro catalogo[], int maxLibros) {
 
         token = strtok(NULL, ",");
         if (token == NULL) continue;
-        catalogo[cantidad].years = atoi(token);
+        catalogo[cantidad].anio = atoi(token);
 
         cantidad++;
     }
@@ -106,6 +110,12 @@ void registrarUsuario(Usuario *usuariosHash[MAX_USUARIOS]) {
 }
 
 int main() {
+    Map *mapaAñoPublicacion = map_create();
+    Map *mapaCategoria = map_create();
+    Map *mapaTitulo = map_create();
+    Map *mapaAutor = map_create();
+    Map *mapaId = map_create();
+
     Libro catalogo[MAX_LIBROS];
     int totalLibros = cargarCatalogo("catalogo.csv", catalogo, MAX_LIBROS);
 
