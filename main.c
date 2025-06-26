@@ -122,7 +122,7 @@ void buscarTitulo(Libro catalogo[], int total){
             printf("Titulo: %s\n", catalogo[i].titulo);
             printf("Autor: %s\n", catalogo[i].autor);
             printf("Genero: %s", catalogo[i].genero);
-            printf("years: %d\n", catalogo[i].years);
+            printf("years: %d\n", catalogo[i].anio);
             encontrado = 1;
             break;
         }
@@ -133,6 +133,80 @@ void buscarTitulo(Libro catalogo[], int total){
     }
 
 }
+void buscarAutor(Libro catalogo[], int total){
+    char autor[MAX_STR];
+    printf("Ingrese el nombre autor a buscar: ");
+    getchar();
+    fgets(autor,MAX_STR,stdin);
+    autor[strcpn(autor, "\n")] = 0;
+    int encontrado = 0;
+    printf("\nLibros por autor:\n",autor);
+    for(int i = 0; i < total; i++){
+        if(strcmp(catalogo[i].autor,autor) == 0){
+            printf("\nID: %d\n", catalogo[i].id);
+            printf("Titulo: %s\n", catalogo[i].titulo);
+            printf("Autor: %s\n", catalogo[i].autor);
+            printf("Genero: %s", catalogo[i].genero);
+            printf("years: %d\n", catalogo[i].anio);
+            encontrado = 1;
+            break;
+        }
+    }
+    if(!encontrado){
+        printf("No se encontro :(\n");
+
+    }
+}
+
+void buscarGenero(Libro catalogo[], int total){
+    char genero[MAX_STR];
+    printf("Ingrese el genero a buscar: ");
+    getchar();
+    fgets(genero,MAX_STR,stdin);
+    genero[strcpn(genero, "\n")] = 0;
+    int encontrado = 0;
+    printf("\nLibros por genero:\n",genero);
+    for(int i = 0; i < total; i++){
+        if(strcmp(catalogo[i].autor,genero) == 0){
+            printf("\nID: %d\n", catalogo[i].id);
+            printf("Titulo: %s\n", catalogo[i].titulo);
+            printf("Autor: %s\n", catalogo[i].autor);
+            printf("Genero: %s", catalogo[i].genero);
+            printf("years: %d\n", catalogo[i].anio);
+            encontrado = 1;
+            break;
+        }
+    }
+    if(!encontrado){
+        printf("No se encontro :(\n");
+
+    }
+}
+void buscarGenero(Libro catalogo[], int total){
+    char years[MAX_STR];
+    printf("Ingrese el anio a buscar: ");
+    getchar();
+    fgets(years,MAX_STR,stdin);
+    years[strcpn(years, "\n")] = 0;
+    int encontrado = 0;
+    printf("\nLibros por anio:\n",years);
+    for(int i = 0; i < total; i++){
+        if(strcmp(catalogo[i].autor,years) == 0){
+            printf("\nID: %d\n", catalogo[i].id);
+            printf("Titulo: %s\n", catalogo[i].titulo);
+            printf("Autor: %s\n", catalogo[i].autor);
+            printf("Genero: %s", catalogo[i].genero);
+            printf("years: %d\n", catalogo[i].anio);
+            encontrado = 1;
+            break;
+        }
+    }
+    if(!encontrado){
+        printf("No se encontro :(\n");
+
+    }
+}
+
 
 
 
