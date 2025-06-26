@@ -28,7 +28,7 @@ int cargarCatalogo(const char *nombreArchivo, Libro catalogo[], int maxLibros) {
         return 0;
     }
 
-    char linea[512];
+    char linea[500];
     int cantidad = 0;
 
     fgets(linea, sizeof(linea), archivo);
@@ -104,6 +104,34 @@ void registrarUsuario(Usuario *usuariosHash[MAX_USUARIOS]) {
 
     printf("Usuario con ID %d registrado exitosamente.\n", id);
 }
+
+void buscarTitulo(Libro catalogo[], int total){
+    char titulo[MAX_STR];
+    printf("Ingrese el titulo del libro a buscar: ");
+    getchar();
+    fgets(titulo,MAX_STR,stdin);
+    titulo[strcpn(titulo, "\n")] = 0;
+    int encontrado = 0;
+    for(int i = 0; i < total; i++){
+        if(strcmp(catalogo[i].titulo,titulo) == 0){
+            printf("Libro encontrado:\n");
+            printf("Titulo: %s\n", catalogo[i].titulo);
+            printf("Autor: %s\n", catalogo[i].autor);
+            printf("Genero: %s", catalogo[i].genero);
+            printf("years: %d\n", catalogo[i].years);
+            encontrado = 1;
+            break;
+        }
+    }
+    if(!encontrado){
+        printf("No se encontro :(\n");
+
+    }
+
+}
+
+
+
 
 int main() {
     Libro catalogo[MAX_LIBROS];
