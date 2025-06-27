@@ -123,14 +123,16 @@ void buscarTitulo(Map *librosPorTitulo){
     printf("Ingrese el titulo del libro a buscar: ");
     getchar();
     fgets(titulo,MAX_STR,stdin);
-    titulo[strcpn(titulo, "\n")] = 0;
+    titulo[strcspn (titulo, "\n")] = 0;
 
-    Libro *libro = map_search(librosPorTitulo, titulo);
+    MapPair *pair = map_search(librosPorTitulo, titulo);
 
-    if(libro == NULL){
+    if(pair == NULL){
         printf("No se encontre el libro .(\n)");
         return;
     }
+    Libro *libro = (Libro *)pair->value;
+
     printf("Libro encontrado:\n");
     printf("Titulo: %s\n", libro->titulo);
     printf("Autor: %s\n", libro->autor);
@@ -144,22 +146,26 @@ void buscarAutor(Map *librosPorAutor){
     printf("Ingrese el nombre autor a buscar: ");
     getchar();
     fgets(autor,MAX_STR,stdin);
-    autor[strcpn(autor, "\n")] = 0;
+    autor[strcspn (autor, "\n")] = 0;
 
-    List *libros = map_search(librosPorAutor,autor);
-    if(libros == NULL || list_size(libros) == 0){
-        printf("No se encontraron libros del autor.\n");
-    }
+    MapPair *pair = map_first(librosPorAutor);
+    int encontrado = 0;
     printf("\nLibros por autor:\n",autor);
-    Libro *libro = list_first(libros);
-    while(libro != NULL){
-        printf("\nID: %d\n", libro->id);
-        printf("Titulo: %s\n", libro->titulo);
-        printf("Autor: %s\n", libro->autor);
-        printf("Genero: %s", libro->genero);
-        printf("years: %d\n", libro->anio);
-        libro = list_next(libros);
+    while(pair != NULL){
+        Libro *libro = (Libro *)pair->value;
+        if(strcmp(libro->autor, autor) == 0) {
+            printf("\nID: %d\n", libro->id);
+            printf("Titulo: %s\n", libro->titulo);
+            printf("Autor: %s\n", libro->autor);
+            printf("Genero: %s", libro->genero);
+            printf("years: %d\n", libro->anio);
+            encontrado = 1;
         }
+        pair = map_next(librosPorAutor);
+    }
+    if(!encontrado) {
+        printf("No se encontre libro por autor");
+    }
 }
 
 void buscarGenero(Map *librosPorGenero){
@@ -167,22 +173,26 @@ void buscarGenero(Map *librosPorGenero){
     printf("Ingrese el nombre autor a buscar: ");
     getchar();
     fgets(genero,MAX_STR,stdin);
-    genero[strcpn(genero, "\n")] = 0;
+    genero[strcspn (genero, "\n")] = 0;
 
-    List *libros = map_search(librosPorGenero,genero);
-    if(libros == NULL || list_size(libros) == 0){
-        printf("No se encontraron libros del autor.\n");
-    }
-    printf("\nLibros por genero:\n",genero);
-    Libro *libro = list_first(libros);
-    while(libro != NULL){
-        printf("\nID: %d\n", libro->id);
-        printf("Titulo: %s\n", libro->titulo);
-        printf("Autor: %s\n", libro->autor);
-        printf("Genero: %s", libro->genero);
-        printf("years: %d\n", libro->anio);
-        libro = list_next(libros);
+    MapPair *pair = map_first(librosPorGenero);
+    int encontrado = 0;
+    printf("\nLibros por autor:\n",genero);
+    while(pair != NULL){
+        Libro *libro = (Libro *)pair->value;
+        if(strcmp(libro->autor, genero) == 0) {
+            printf("\nID: %d\n", libro->id);
+            printf("Titulo: %s\n", libro->titulo);
+            printf("Autor: %s\n", libro->autor);
+            printf("Genero: %s", libro->genero);
+            printf("Anio de publicacion: %d\n", libro->anio);
+            encontrado = 1;
         }
+        pair = map_next(librosPorGenero);
+    }
+    if(!encontrado) {
+        printf("No se encontro libro por genero");
+    }
 }
 
 
@@ -191,22 +201,27 @@ void buscarAnio(Map *librosPorAnio){
     printf("Ingrese el nombre autor a buscar: ");
     getchar();
     fgets(years,MAX_STR,stdin);
-    years[strcpn(years, "\n")] = 0;
-
-    List *libros = map_search(librosPorAnio,years);
-    if(libros == NULL || list_size(libros) == 0){
-        printf("No se encontraron libros del autor.\n");
-    }
-    printf("\nLibros por anio:\n",years);
-    Libro *libro = list_first(libros);
-    while(libro != NULL){
-        printf("\nID: %d\n", libro->id);
-        printf("Titulo: %s\n", libro->titulo);
-        printf("Autor: %s\n", libro->autor);
-        printf("Genero: %s", libro->genero);
-        printf("years: %d\n", libro->anio);
-        libro = list_next(libros);
+    years[strcspn (years, "\n")] = 0;
+    
+    MapPair *pair = map_first(librosPorAnio);
+    int encontrado = 0;
+    printf("\nLibros por autor:\n",years);
+    while(pair != NULL){
+        Libro *libro = (Libro *)pair->value;
+        if(strcmp(libro->autor, years) == 0) {
+            printf("\nID: %d\n", libro->id);
+            printf("Titulo: %s\n", libro->titulo);
+            printf("Autor: %s\n", libro->autor);
+            printf("Genero: %s", libro->genero);
+            printf("Anio de publicacion: %d\n", libro->anio);
+            encontrado = 1;
         }
+        pair = map_next(librosPorAnio);
+    }
+    if(!encontrado) {
+        printf("No se encontro libro por anio");
+    }
+
 }
 
 
@@ -218,38 +233,154 @@ void RealizarPrestamo(Map *mapaUsuarios , Map *mapaId)
     printf("Ingrese su ID de usuario: ");
     scanf("%d", &idUsuario);
 
-    Usuario* usuario = map_search(mapaUsuarios , idUsuario );
-    if (usuario == NULL) {
+    MapPair *pairUsuario = map_search(mapaUsuarios , &idUsuario );
+    if (pairUsuario == NULL) {
         printf("Usuario no encontrado.\n");
         return;
     }
+    Usuario *usuario = (Usuario *)pairUsuario->value;
+    
 
     printf("Ingrese el id del libro que desea solicitar: ");
     getchar(); // Limpiar buffer
     scanf("%d" , &idLibro);
 
-    Libro* libro = map_search(mapaId , idLibro);
-    if (libro == NULL) {
+    MapPair *pairLibro = map_search(mapaId, &idLibro);
+    if (pairLibro == NULL) {
         printf("Libro no encontrado en el catálogo.\n");
         return;
     }
 
-    if (libro->estado == PRESTADO) {
-        printf("El libro ya está prestamo actualmente.\n");
+    Libro *libro = (Libro *)pairLibro->value;
+    
+    if(libro->estado == PRESTADO) {
+        printf("El libro ya esta prestado.\n");
         return;
     }
-
-    // Marcar libro como prestado
     libro->estado = PRESTADO;
 
     // Agregar a lista de préstamos actuales del usuario
-    list_push_back(usuario->prestamosActuales, libro);
+    list_pushBack(usuario->prestamosActuales, libro);
 
     // Agregar también al historial del usuario
-    list_push_back(usuario->historial, libro);
+    list_pushBack(usuario->historial, libro);
 
     printf("El libro '%s' ha sido prestado con éxito al usuario %d.\n", libro->titulo, idUsuario);
 }
+
+
+void devolverLibro(Usuario *usuarios[MAX_USUARIOS]){
+    int id;
+    printf("Ingrese su ID usario: ");
+    scanf("%d",&id);
+
+    int pos = id % MAX_USUARIOS;
+    int original = pos;
+
+    while(usuarios[pos] != NULL && usuarios[pos]->idUsuario != id){
+        pos = (pos + 1) % MAX_USUARIOS;
+        if(pos == original) {
+            printf("Usuario no encontrado.\n");
+            return;
+        }
+    }
+    Usuario  *usuario = usuarios[pos];
+    if(usuario == NULL){
+        printf("Usuario no encontrado.\n");
+        return;
+    }
+    if(list_size(usuario->prestamosActuales)== 0){
+        printf("No tienes libros prestados actualmente.\n");
+        return;
+    }
+    printf("\nLibros prestados:\n");
+    List *prestamos = usuario->prestamosActuales;
+    Libro *libro = list_first(prestamos);
+    int i = 1;
+
+    while(libro != NULL){
+        printf("%d. %s\n", i++, libro->titulo);
+        libro = list_next(prestamos);
+    }
+
+    char titulo[MAX_STR];
+    printf("Ingrese el titulo dl libro a devolver: ");
+    getchar();
+    fgets(titulo, MAX_STR, stdin);
+    titulo[strcspn(titulo, "\n")] = 0;
+    List *newList = list_create();
+    prestamos = usuario->prestamosActuales;
+    libro = list_first(prestamos);
+    
+    int encontrado = 0;
+    while(libro != NULL){
+        if(strcmp(libro->titulo, titulo) == 0 && !encontrado){
+            libro->estado = true;
+            list_pushBack(usuario->historial,libro);
+            encontrado = 1;
+        } else {
+            list_pushBack(newList,libro);
+        }
+        libro = list_next(prestamos);
+
+    }
+    if(!encontrado) {
+        printf("No se encontro libro en prestamos.\n");
+        list_clean(newList);
+        return;
+    }
+
+    list_clean(usuario->prestamosActuales);
+    usuario->prestamosActuales = newList;
+    printf("Libro %s devuelto correctamente.\n",titulo);
+
+}
+
+void *int_to_ptr(int n) {
+    return (void *)(long)n;
+}
+
+
+void consultarPerfilUsario(Map *Usuarios) {
+    int id;
+    printf("Ingrese ID usuario: ");
+    scanf("%d", &id);
+
+    void *key = int_to_ptr(id);
+    MapPair *pair = map_search(Usuarios,key);
+    
+
+    if(pair == NULL){
+        printf(" Usario con ID %d no encontrado.\n",id);
+        return;
+    }
+    Usuario *usuario = (Usuario *)pair->value;
+    printf("\n Perfil del Usuario ID: %d\n",id);
+
+    printf("\n Libros actualmente prestados:\n");
+    if(list_size(usuario->prestamosActuales) == 0) {
+        printf(" - NO tiene libros prestados actualmente.\n");
+    } else {
+        Libro *libro = list_first(usuario->prestamosActuales);
+        while(libro != NULL) {
+            printf("%s - %s - %s - %d\n",libro->titulo,libro->autor,libro->genero,libro->anio);
+            libro = list_next(usuario->prestamosActuales);
+        }
+    }
+    printf("\n Historial de prestamos:\n");
+    if(list_size(usuario->historial) == 0) {
+        printf("No tiene libros en historial.\n");
+    } else {
+        Libro *libro = list_first(usuario->historial);
+        while(libro != NULL){
+            printf("%s - %s - %s - %d\n",libro->titulo,libro->autor,libro->genero,libro->anio);
+            libro = list_next(usuario->historial);
+        }
+    }
+
+}
+
+
 
 
 // Función para detectar teclas especiales (como flechas)
@@ -314,7 +445,7 @@ void MenuLibro(int opcionSeleccionada)
         "4. Por autor",
     };
     
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 4; i++) {
         if (i == opcionSeleccionada) {
             printf("> "); // Indicador de selección
         } else {
@@ -403,6 +534,7 @@ do {
             break;
     }
 } while (tecla != KEY_ESC); 
+}
 
 int main() 
 {
