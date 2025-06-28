@@ -116,10 +116,6 @@ int is_equal_str(void *key1, void *key2)
     char *a = (char *)key1;
     char *b = (char *)key2;
     int result = strcmp(a, b) == 0;
-    if (!result)
-    {
-        printf("DEBUG NO IGUAL: '%s' vs '%s'\n", a, b);
-    }
     return result;
 }
 
@@ -368,73 +364,73 @@ void RealizarPrestamo(Map *mapaUsuarios, Map *mapaId)
 
 void devolverLibro(Map *mapaUsuarios)
 {
-    int id;
-    printf("Ingrese su ID de usuario: ");
-    scanf("%d", &id);
+    int idUsuario;
+    char titulo[MAX_STR];
 
-    MapPair *pairUsuario = map_search(mapaUsuarios, &id);
-    if (pairUsuario == NULL)
-    {
+    printf("📤 Registrar Devolución\n");
+
+    // Solicitar ID del usuario
+    printf("Ingrese ID de usuario: ");
+    scanf("%d", &idUsuario);
+    limpiarBufferEntrada(); // limpia salto de línea pendiente
+
+    // Buscar usuario
+    MapPair *pairUsuario = map_search(mapaUsuarios, &idUsuario);
+    if (pairUsuario == NULL) {
         printf("Usuario no encontrado.\n");
         return;
     }
 
     Usuario *usuario = (Usuario *)pairUsuario->value;
 
-    if (list_size(usuario->prestamosActuales) == 0)
-    {
-        printf("No tienes libros prestados actualmente.\n");
+    // Verificar si tiene libros prestados
+    if (list_size(usuario->prestamosActuales) == 0) {
+        printf("El usuario no tiene libros prestados actualmente.\n");
         return;
     }
 
-    printf("\nLibros prestados:\n");
-    List *prestamos = usuario->prestamosActuales;
-    Libro *libro = list_first(prestamos);
-    int i = 1;
-
-    while (libro != NULL)
-    {
-        printf("%d. %s\n", i++, libro->titulo);
-        libro = list_next(prestamos);
+    // Mostrar libros prestados
+    printf("Libros actualmente prestados:\n");
+    Libro *libro = list_first(usuario->prestamosActuales);
+    while (libro != NULL) {
+        printf("- %s\n", libro->titulo);
+        libro = list_next(usuario->prestamosActuales);
     }
 
-    char titulo[MAX_STR];
-    printf("Ingrese el título del libro a devolver: ");
-    getchar(); // Limpia el salto de línea anterior
+    // Pedir título del libro a devolver
+    printf("Ingrese título del libro a devolver: ");
     fgets(titulo, MAX_STR, stdin);
-    titulo[strcspn(titulo, "\n")] = 0;
+    titulo[strcspn(titulo, "\n")] = '\0';
 
+    // Buscar el libro en prestamosActuales
     List *nuevaLista = list_create();
-    prestamos = usuario->prestamosActuales;
-    libro = list_first(prestamos);
-
     int encontrado = 0;
-    while (libro != NULL)
-    {
-        if (strcmp(libro->titulo, titulo) == 0 && !encontrado)
-        {
+    libro = list_first(usuario->prestamosActuales);
+
+    while (libro != NULL) {
+        if (strcmp(libro->titulo, titulo) == 0 && !encontrado) {
             libro->estado = DISPONIBLE;
-            list_pushBack(usuario->historial, libro);
+            list_pushBack(usuario->historial, libro); // sigue en historial
             encontrado = 1;
-        }
-        else
-        {
+        } else {
             list_pushBack(nuevaLista, libro);
         }
-        libro = list_next(prestamos);
+        libro = list_next(usuario->prestamosActuales);
     }
 
-    if (!encontrado)
-    {
-        printf("No se encontró el libro en los préstamos.\n");
+    if (!encontrado) {
+        printf("No se encontró el libro '%s' en los préstamos del usuario.\n", titulo);
         list_clean(nuevaLista);
         return;
     }
 
+    // Reemplazar la lista de préstamos con la nueva lista
     list_clean(usuario->prestamosActuales);
     usuario->prestamosActuales = nuevaLista;
 
-    printf("Libro '%s' devuelto correctamente.\n", titulo);
+    printf("[✔] Devolución registrada correctamente.\n");
+    printf("Presione cualquier tecla para volver al menú...\n");
+    getch();
 }
 
 void int_to_ptr(int n)
@@ -518,6 +514,18 @@ void mostrar_catalogo(Map *mapaTitulo)
     }
 }
 
+bool libroYaEnLista(List *lista, Libro *libro) {
+    Libro *actual = list_first(lista);
+    while (actual != NULL) {
+        if (strcmp(actual->titulo, libro->titulo) == 0 &&
+            strcmp(actual->autor, libro->autor) == 0) {
+            return true;
+        }
+        actual = list_next(lista);
+    }
+    return false;
+}
+
 void ver_historial(Map *mapaUsuarios)
 {
     int id;
@@ -533,7 +541,7 @@ void ver_historial(Map *mapaUsuarios)
     }
 
     Usuario *usuario = (Usuario *)pair->value;
-    printf("\nHistorial de préstamos para el usuario %d:\n", id);
+    printf("\n📑 Historial de préstamos para el usuario %d:\n", id);
 
     if (list_size(usuario->historial) == 0)
     {
@@ -541,12 +549,26 @@ void ver_historial(Map *mapaUsuarios)
         return;
     }
 
+    // Lista temporal para no repetir libros
+    List *vistos = list_create();
     Libro *libro = list_first(usuario->historial);
+    int contador = 0;
+
     while (libro != NULL)
     {
-        printf("%s - %s - %s - %d\n", libro->titulo, libro->autor, libro->genero, libro->anio);
+        if (!libroYaEnLista(vistos, libro))
+        {
+            printf("- %s | %s | %s | %d\n", libro->titulo, libro->autor, libro->genero, libro->anio);
+            list_pushBack(vistos, libro);
+            contador++;
+        }
         libro = list_next(usuario->historial);
     }
+
+    if (contador == 0)
+        printf("No hay libros únicos en el historial.\n");
+
+    list_clean(vistos); // Liberar lista temporal
 }
 
 void limpiarBufferEntrada()
